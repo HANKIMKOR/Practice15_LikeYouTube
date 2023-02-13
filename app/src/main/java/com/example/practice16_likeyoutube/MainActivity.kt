@@ -3,6 +3,10 @@ package com.example.practice16_likeyoutube
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.Adapter
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.practice16_likeyoutube.adapter.VideoAdapter
 import com.example.practice16_likeyoutube.dto.VideoDto
 import com.example.practice16_likeyoutube.service.VideoService
 import retrofit2.Call
@@ -13,6 +17,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var videoAdapter: VideoAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +26,15 @@ class MainActivity : AppCompatActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragmentContainer, PlayerFragment())
             .commit()
+
+        videoAdapter = VideoAdapter()
+
+        findViewById<RecyclerView>(R.id.mainRecyclerView).apply {
+            adapter = videoAdapter
+            layoutManager = LinearLayoutManager(context)
+        }
+
+        getVideoList()
     }
 
     private fun getVideoList() {
@@ -37,10 +51,10 @@ class MainActivity : AppCompatActivity() {
                     Log.d("MainActivity", "response fail")
                     return
                 }
-                response.body()?.let {
-                    Log.d("MainActivity", it.toString())
-                }
+                response.body()?.let {videoDto ->
+                    videoAdapter.submitList(videoDto.videos)
 
+                }
 
             }
 
